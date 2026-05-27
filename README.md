@@ -24,7 +24,7 @@ You can toggle between the 3 environments (Exp, Dev, Prod) by altering the `ENV`
 
 ## Automated Backend Deployment (Google Apps Script)
 
-This repository includes a GitHub Action to automatically deploy changes made in the `backend/` folder directly to Google Apps Script using `clasp`. This workflow will push the code and **update your existing Web App URL** seamlessly.
+This repository includes a GitHub Action to automatically deploy changes made in the `backend/` folder directly to Google Apps Script using `clasp`. This workflow will push the code and **update your existing Web App URL** seamlessly, without needing a hardcoded `.clasp.json` file in the repo.
 
 ### Setup Instructions via GitHub Codespaces:
 
@@ -39,14 +39,16 @@ This repository includes a GitHub Action to automatically deploy changes made in
 
 **Part 2: Retrieve your existing Deployment ID**
 1. You must have deployed your Google Apps Script as a Web App at least once (via the Apps Script Editor: Deploy > New Deployment > Web App).
-2. Inside your Codespaces terminal, link to your Apps Script project by running: `cd backend && clasp clone <SCRIPT_ID>`
+2. Inside your Codespaces terminal, temporarily link to your Apps Script project by running: `cd backend && clasp clone <SCRIPT_ID>` *(Note: `.clasp.json` is ignored by git so it won't be committed).*
 3. Run the command: `clasp deployments`
 4. You will see a list of deployments. Look for the one associated with your active Web App. It will look something like this:
    `- AKfycb... @1 - web app meta-version`
 5. Copy the deployment ID string (e.g., `AKfycbwECIelwQpWq-bVniCpHgLqQlBGA0lGzPsN--4xBVoGQUbJsQT18b6zi8F00UMV2mpG`).
 
 **Part 3: Add GitHub Secrets**
-1. Go to your GitHub repository **Settings > Secrets and variables > Actions**.
-2. Create a New Repository Secret named `CLASP_CREDENTIALS`. Paste your credential JSON object here. *(Note: The workflow is explicitly built to parse custom dictionary formats containing `tokens.default` as well as native `.clasprc.json` formats).*
-3. Create a second Repository Secret named `GAS_DEPLOYMENT_ID`. Paste the deployment ID you copied in Part 2 here.
-4. Future commits to the `main` branch that modify files in the `backend/` directory will now trigger the workflow, automatically push the code, and publish a new version without changing your Web App URL.
+Go to your GitHub repository **Settings > Secrets and variables > Actions** and add the following 3 Repository Secrets:
+1. `GAS_SCRIPT_ID`: Paste your Apps Script Project ID here.
+2. `GAS_DEPLOYMENT_ID`: Paste the Deployment ID you copied in Part 2 here.
+3. `CLASP_CREDENTIALS`: Paste your credential JSON object here. *(Note: The workflow is explicitly built to parse custom dictionary formats containing `tokens.default` as well as native `.clasprc.json` formats).*
+
+Future commits to the `main` branch that modify files in the `backend/` directory will now trigger the workflow, dynamically create the `.clasp.json` configuration, push the code, and publish a new version without changing your Web App URL.

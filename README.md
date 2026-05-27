@@ -1,4 +1,5 @@
 # NumPal Modular Workspace
+# https://digitalsolutionssne-bit.github.io/Numeracy-Exp/
 
 This repository has been restructured to facilitate modular development, isolated environments, and automated deployments for both the GitHub Pages frontend and the Google Apps Script backend.
 

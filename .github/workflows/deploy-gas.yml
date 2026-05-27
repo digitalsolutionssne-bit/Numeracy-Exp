@@ -47,6 +47,11 @@ jobs:
             end
           ' > ~/.clasprc.json
 
+      - name: Create Clasp Project Config
+        run: |
+          # Dynamically create the .clasp.json file using the GitHub secret
+          echo '{ "scriptId": "${{ secrets.GAS_SCRIPT_ID }}", "rootDir": "." }' > backend/.clasp.json
+
       - name: Push and Deploy to Google Apps Script
         run: |
           cd backend

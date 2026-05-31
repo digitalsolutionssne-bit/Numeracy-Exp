@@ -1,45 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Time | NumPal</title>
-  <link rel="stylesheet" href="../css/styles.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+ <title>Time | NumPal</title>
+ <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-  <header class="top-bar">
-      <a href="../../index.html" class="back-btn" aria-label="Go back">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-          Back
-      </a>
-      <h1>⌚ Time Menu</h1>
-      <div class="header-actions">
-          <a href="../../index.html" class="header-icon-btn" aria-label="Home">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          </a>
-          <button id="theme-toggle" class="header-icon-btn" style="font-size:1.5rem;">🌗</button>
-      </div>
-  </header>
+ <header class="top-bar" data-edit-id="timemenu_header">
+     <a href="../../index.html" class="back-btn" aria-label="Go back" data-edit-id="timemenu_btn_back">
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+             <polyline points="15 18 9 12 15 6"></polyline>
+         </svg>
+         Back
+     </a>
+     <h1 data-edit-id="timemenu_title">⌚ Time Menu</h1>
+     <div class="header-actions">
+         <a href="../../index.html" class="header-icon-btn" aria-label="Home" data-edit-id="timemenu_btn_home">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+         </a>
+         <button id="theme-toggle" class="header-icon-btn" style="font-size:1.5rem;" data-edit-id="timemenu_btn_theme">🌗</button>
+     </div>
+ </header>
 
-  <main class="menu-container">
-      <a href="stopwatch.html" class="menu-card time-card">
-          <span class="icon">⏱️</span>
-          <h2>Stop Watch</h2>
-      </a>
-      <a href="duration.html" class="menu-card time-card">
-          <span class="icon">⏳</span>
-          <h2>Find Duration</h2>
-      </a>
-      <a href="end-time.html" class="menu-card time-card">
-          <span class="icon">🕒</span>
-          <h2>Find End Time</h2>
-      </a>
-  </main>
+ <main class="menu-container" data-edit-id="timemenu_main_container">
+     <a href="stopwatch.html" class="menu-card time-card" data-edit-id="timemenu_card_stopwatch">
+         <span class="icon" data-edit-id="timemenu_icon_stopwatch">⏱️</span>
+         <h2 data-edit-id="timemenu_text_stopwatch">Stop Watch</h2>
+     </a>
+     <a href="duration.html" class="menu-card time-card" data-edit-id="timemenu_card_duration">
+         <span class="icon" data-edit-id="timemenu_icon_duration">⏳</span>
+         <h2 data-edit-id="timemenu_text_duration">Find Duration</h2>
+     </a>
+     <a href="end-time.html" class="menu-card time-card" data-edit-id="timemenu_card_endtime">
+         <span class="icon" data-edit-id="timemenu_icon_endtime">🕒</span>
+         <h2 data-edit-id="timemenu_text_endtime">Find End Time</h2>
+     </a>
+ </main>
 
-  <script src="../js/core/config.js"></script>
-  <script src="../js/core/app.js"></script>
-  <script src="../js/utils/ui.js"></script>
+ <script src="../js/utils/style-manager.js"></script>
+ <script src="../js/utils/visual-editor.js"></script>
+ <script src="../js/core/config.js"></script>
+ <script src="../js/core/app.js"></script>
+ <script src="../js/utils/ui.js"></script>
 </body>
 </html>

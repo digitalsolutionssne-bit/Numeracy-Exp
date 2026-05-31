@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+ <title>Admin Settings | NumPal</title>
+ <link rel="stylesheet" href="../css/styles.css">
+ <style>
+    .admin-section {
+        background: var(--card-bg);
+        border: 2px solid var(--card-border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        flex-shrink: 0;
+    }
+    .admin-section h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        color: var(--primary-color);
+        border-bottom: 2px dashed var(--card-border);
+        padding-bottom: 8px;
+    }
+    .admin-label {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: var(--text-color);
+    }
+    .admin-input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 2px solid var(--card-border);
+        font-size: 1.1rem;
+        background: var(--bg-color);
+        color: var(--text-color);
+        box-sizing: border-box;
+    }
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .action-btn {
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: none;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        text-align: center;
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-primary { background: var(--primary-color); color: white; }
+    .btn-success { background: var(--success-color); color: white; }
+    .btn-danger { background: var(--error-color); color: white; }
+    .btn-warning { background: #FF9800; color: white; }
+    textarea.admin-input {
+        height: 150px;
+        resize: vertical;
+        font-family: monospace;
+        font-size: 0.9rem;
+    }
+ </style>
+</head>
+<body>
+ <header class="top-bar">
+     <a href="../../index.html" class="back-btn" aria-label="Go back">
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Back
+     </a>
+     <h1>⚙️ Admin Dashboard</h1>
+     <div class="header-actions">
+         <button id="theme-toggle" class="header-icon-btn" style="font-size:1.5rem;">🌗</button>
+     </div>
+ </header>
+
+ <main class="page-content" style="overflow-y: auto; padding: 1.5rem;">
+     
+     <div class="admin-section">
+         <h2>1. Visual Customization</h2>
+         <p style="margin: 0; font-size: 1rem; opacity: 0.9;">Enter Edit Mode to visually move, scale, resize, and hide components across the app. Changes are saved to the Active Profile.</p>
+         <button class="action-btn btn-warning" id="btn-enter-editor" style="width: 100%; font-size: 1.2rem; padding: 15px;">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+             Start Editing App
+         </button>
+     </div>
+
+     <div class="admin-section">
+         <h2>2. Profile Management</h2>
+         <label class="admin-label">Active Profile (Applies styles immediately):</label>
+         <select id="profile-select" class="admin-input">
+             <!-- Populated by JS -->
+         </select>
+         
+         <div class="btn-group">
+             <button class="action-btn btn-success" id="btn-create-profile">+ Create New</button>
+             <button class="action-btn btn-danger" id="btn-delete-profile">🗑 Delete Active</button>
+         </div>
+     </div>
+
+     <div class="admin-section">
+         <h2>3. Backup & Share Configurations</h2>
+         <p style="margin: 0; font-size: 1rem; opacity: 0.9;">Export your layout profiles to share with another device, or import a shared configuration code here.</p>
+         
+         <label class="admin-label">Configuration Data (JSON):</label>
+         <textarea id="config-data" class="admin-input" placeholder="Paste configuration data here to import..."></textarea>
+         
+         <div class="btn-group">
+             <button class="action-btn btn-primary" id="btn-export">📤 Export All</button>
+             <button class="action-btn btn-success" id="btn-import">📥 Import & Merge</button>
+         </div>
+         <p id="export-msg" style="color: var(--success-color); font-weight: bold; margin: 0; display: none; text-align: center;">Copied to clipboard!</p>
+     </div>
+
+ </main>
+
+ <script src="../js/core/config.js"></script>
+ <script src="../js/core/app.js"></script>
+ <script src="../js/utils/ui.js"></script>
+ <script src="../js/pages/admin.js"></script>
+</body>
+</html>

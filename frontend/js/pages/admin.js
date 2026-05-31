@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Failed to load cloud profiles: " + err.message);
         } finally {
             btnRefreshCloud.disabled = false;
-            btnRefreshCloud.innerText = "🔄 Refresh Cloud Profiles";
+            btnRefreshCloud.innerText = "🔄 Refresh";
         }
     }
 
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (profileNames.length === 0) {
             cloudUpdateName.innerHTML = '<option value="">No profiles in cloud</option>';
             cloudDownloadName.innerHTML = '<option value="">No profiles in cloud</option>';
-            cloudDownloadVersion.innerHTML = '';
+            cloudDownloadVersion.innerHTML = '<option value="">-</option>';
             return;
         }
 

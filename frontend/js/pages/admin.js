@@ -51,6 +51,15 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('numpal_active_profile', id);
     }
 
+    // Auto-fill cloud name with local profile name
+    function syncCloudNameField() {
+        const activeId = getActiveProfileId();
+        const profiles = getProfiles();
+        if(activeId && profiles[activeId]) {
+            cloudNewName.value = profiles[activeId].name;
+        }
+    }
+
     function refreshProfileDropdown() {
         const profiles = getProfiles();
         
@@ -72,10 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             profileSelect.appendChild(opt);
         }
+        
+        syncCloudNameField();
     }
 
     profileSelect.addEventListener('change', (e) => {
         setActiveProfileId(e.target.value);
+        syncCloudNameField();
         if(typeof window.showToast === 'function') window.showToast('Profile applied successfully!');
     });
 
@@ -203,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Failed to load cloud profiles: " + err.message);
         } finally {
             btnRefreshCloud.disabled = false;
-            btnRefreshCloud.innerText = "🔄 Refresh";
+            btnRefreshCloud.innerText = "🔄 Refresh Cloud Data";
         }
     }
 
@@ -304,7 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if(typeof window.showToast === 'function') window.showToast("Successfully backed up to Google Drive!");
-            cloudNewName.value = '';
             cloudVersionDesc.value = '';
             
             // Reload data to reflect changes
@@ -314,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Backup failed: " + err.message);
         } finally {
             btnCloudBackup.disabled = false;
-            btnCloudBackup.innerText = "☁️ Save to Google Drive";
+            btnCloudBackup.innerText = "☁️ Save Active Profile to Google Drive";
         }
     });
 

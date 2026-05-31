@@ -82,23 +82,14 @@
         display: flex;
         align-items: center;
         gap: 5px;
-        font-size: 1.1rem;
+        font-size: 1rem;
         cursor: pointer;
+        font-weight: bold;
     }
     .radio-group input[type="radio"] {
         width: 20px;
         height: 20px;
         cursor: pointer;
-    }
-    .cloud-box {
-        padding: 15px;
-        border-radius: 8px;
-        border: 2px solid;
-    }
-    .sync-panel {
-        border-left: 4px solid;
-        padding-left: 12px;
-        margin-bottom: 20px;
     }
  </style>
 </head>
@@ -117,7 +108,7 @@
      
      <div class="admin-section">
          <h2>1. Visual Customization</h2>
-         <p style="margin: 0; font-size: 1rem; opacity: 0.9;">Enter Edit Mode to visually move, scale, resize, and hide components across the app. Changes are saved to the Active Profile.</p>
+         <p style="margin: 0; font-size: 1rem; opacity: 0.9;">Enter Edit Mode to visually move, scale, resize, and hide components across the app. Changes are saved to the Active Local Profile automatically.</p>
          <button class="action-btn btn-warning" id="btn-enter-editor" style="width: 100%; font-size: 1.2rem; padding: 15px;">
              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
              Start Editing App
@@ -125,68 +116,77 @@
      </div>
 
      <div class="admin-section">
-         <h2>2. Manage Profiles & Cloud Sync</h2>
-         <p style="margin: 0; font-size: 1rem; opacity: 0.9;">Manage your layout profiles locally, or securely backup and retrieve them across different devices using Google Drive.</p>
+         <h2>2. Profiles & Cloud Sync</h2>
          
-         <!-- Local Profile Management -->
-         <div class="cloud-box" style="background-color: var(--bg-color); border-color: var(--card-border); margin-top: 10px;">
-             <h3 style="margin: 0 0 15px 0; color: var(--text-color); display: flex; align-items: center; gap: 8px;">
-                 📱 Local Device Profiles
+         <!-- LOCAL PROFILES -->
+         <div>
+             <h3 style="margin: 0 0 10px 0; color: var(--text-color); display: flex; align-items: center; gap: 8px;">
+                 📱 Manage Local Profiles
              </h3>
-             <label class="admin-label" style="font-size: 0.95rem;">Active Profile (Applies styles immediately):</label>
+             <p style="margin: 0 0 15px 0; font-size: 0.95rem; opacity: 0.9;">Create, delete, or switch the active local profile. All layout edits apply to the Active Local Profile.</p>
+             
+             <label class="admin-label" style="font-size: 0.95rem;">Active Local Profile:</label>
              <select id="profile-select" class="admin-input" style="margin-bottom: 15px;"></select>
              
              <div class="btn-group">
-                 <button class="action-btn btn-success" id="btn-create-profile">+ Create New</button>
+                 <button class="action-btn btn-success" id="btn-create-profile">+ Create New Local</button>
                  <button class="action-btn btn-danger" id="btn-delete-profile">🗑 Delete Active</button>
              </div>
          </div>
 
-         <!-- Cloud Sync Management -->
-         <div class="cloud-box" style="background-color: rgba(74, 144, 226, 0.05); border-color: rgba(74, 144, 226, 0.3); margin-top: 5px;">
-             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                 <h3 style="margin: 0; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
-                     ☁️ Google Drive Sync
-                 </h3>
-                 <button class="action-btn" id="btn-refresh-cloud" style="background: var(--card-bg); color: var(--text-color); border: 2px solid var(--card-border); padding: 5px 10px; min-width: auto; font-size: 0.85rem;">🔄 Refresh</button>
+         <hr style="border: 0; border-top: 2px dashed var(--card-border); margin: 20px 0; opacity: 0.5;">
+
+         <!-- CLOUD BACKUP -->
+         <div>
+             <h3 style="margin: 0 0 10px 0; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
+                 📤 Backup Active Profile to Cloud
+             </h3>
+             <p style="margin: 0 0 15px 0; font-size: 0.95rem; opacity: 0.9;">Securely save your <strong>Active Local Profile</strong> to Google Drive so it can be downloaded on other devices.</p>
+             
+             <div class="radio-group">
+                 <label><input type="radio" name="cloudSyncType" value="new" checked> New Cloud Profile</label>
+                 <label><input type="radio" name="cloudSyncType" value="update"> Update Existing</label>
              </div>
              
-             <!-- Upload Active Profile -->
-             <div class="sync-panel" style="border-color: var(--primary-color);">
-                 <h4 style="margin: 0 0 10px 0; color: var(--text-color);">📤 Backup Active Profile to Cloud</h4>
-                 
-                 <div class="radio-group">
-                     <label><input type="radio" name="cloudSyncType" value="new" checked> Create New</label>
-                     <label><input type="radio" name="cloudSyncType" value="update"> Update Existing</label>
-                 </div>
-                 
-                 <div id="cloud-new-group">
-                     <input type="text" id="cloud-new-name" class="admin-input" placeholder="New Cloud Profile Name (e.g., Student A)">
-                 </div>
-                 
-                 <div id="cloud-update-group" style="display:none;">
-                     <select id="cloud-update-name" class="admin-input"></select>
-                 </div>
-
-                 <div style="margin-top: 10px;">
-                     <input type="text" id="cloud-version-desc" class="admin-input" placeholder="Version Description (Optional)">
-                 </div>
-                 
-                 <button class="action-btn btn-primary" id="btn-cloud-backup" style="margin-top:15px; width: 100%;">
-                     ☁️ Save to Google Drive
-                 </button>
+             <div id="cloud-new-group">
+                 <label class="admin-label" style="font-size: 0.9rem;">Cloud Profile Name:</label>
+                 <input type="text" id="cloud-new-name" class="admin-input" placeholder="e.g., Student A iPad Layout">
+             </div>
+             
+             <div id="cloud-update-group" style="display:none;">
+                 <label class="admin-label" style="font-size: 0.9rem;">Select Cloud Profile to Update:</label>
+                 <select id="cloud-update-name" class="admin-input"></select>
              </div>
 
-             <!-- Download Profile -->
-             <div class="sync-panel" style="border-color: var(--success-color); margin-bottom: 0;">
-                 <h4 style="margin: 0 0 10px 0; color: var(--text-color);">📥 Download & Apply from Cloud</h4>
-                 <div style="display:flex; flex-direction:column; gap:10px;">
-                     <select id="cloud-download-name" class="admin-input"></select>
-                     <select id="cloud-download-version" class="admin-input"></select>
-                     <button class="action-btn btn-success" id="btn-cloud-download" style="width: 100%;">
-                         Download and Apply Profile
-                     </button>
-                 </div>
+             <div style="margin-top: 10px;">
+                 <label class="admin-label" style="font-size: 0.9rem;">Version Description (Optional):</label>
+                 <input type="text" id="cloud-version-desc" class="admin-input" placeholder="e.g., Increased font sizes">
+             </div>
+             
+             <button class="action-btn btn-primary" id="btn-cloud-backup" style="margin-top:15px; width: 100%;">
+                 ☁️ Save Active Profile to Google Drive
+             </button>
+         </div>
+
+         <hr style="border: 0; border-top: 2px dashed var(--card-border); margin: 20px 0; opacity: 0.5;">
+
+         <!-- CLOUD DOWNLOAD -->
+         <div>
+             <h3 style="margin: 0 0 10px 0; color: var(--success-color); display: flex; align-items: center; gap: 8px;">
+                 📥 Download Profile from Cloud
+             </h3>
+             <p style="margin: 0 0 15px 0; font-size: 0.95rem; opacity: 0.9;">Fetch a profile from Google Drive and add it to this device's local profiles.</p>
+             
+             <div style="display:flex; flex-direction:column; gap:10px;">
+                 <select id="cloud-download-name" class="admin-input"></select>
+                 <select id="cloud-download-version" class="admin-input"></select>
+                 <button class="action-btn btn-success" id="btn-cloud-download" style="width: 100%;">
+                     Download and Apply Profile
+                 </button>
+             </div>
+             
+             <div style="text-align:center; margin-top: 15px;">
+                 <button class="action-btn" id="btn-refresh-cloud" style="background: var(--bg-color); color: var(--text-color); border: 2px solid var(--card-border); margin: 0 auto; display: inline-flex; font-size: 0.85rem; padding: 6px 12px;">🔄 Refresh Cloud Data</button>
              </div>
          </div>
      </div>

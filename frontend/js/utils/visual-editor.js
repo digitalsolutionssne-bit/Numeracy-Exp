@@ -80,13 +80,13 @@
         bar.appendChild(exitBtn);
         document.body.appendChild(bar);
 
-        // Inject Config Panel
+        // Inject Config Panel (Draggable)
         const panel = document.createElement('div');
         panel.id = 'visual-editor-panel';
         panel.style.position = 'fixed';
-        panel.style.top = '50%';
-        panel.style.left = '50%';
-        panel.style.transform = 'translate(-50%, -50%)';
+        // Initialize at a sensible default position without transform to allow simple left/top dragging
+        panel.style.top = '60px';
+        panel.style.left = Math.max(10, (window.innerWidth - 300) / 2) + 'px';
         panel.style.width = '300px';
         panel.style.background = '#fff';
         panel.style.color = '#333';
@@ -98,10 +98,65 @@
         panel.style.flexDirection = 'column';
         panel.style.gap = '15px';
         panel.style.fontFamily = 'sans-serif';
+        panel.style.boxSizing = 'border-box';
 
-        panel.innerHTML = `
-            <h3 style="margin:0; text-align:center; color:#2196F3; font-size:1.2rem;">Adjust Component</h3>
-            <p id="ve-selected-id" style="margin:0; text-align:center; font-size:0.8rem; color:#888;"></p>
+        // Drag Handle / Header
+        const header = document.createElement('div');
+        header.style.cursor = 'move';
+        header.style.background = '#e0e0e0';
+        header.style.padding = '12px';
+        header.style.borderRadius = '16px 16px 0 0';
+        header.style.margin = '-20px -20px 10px -20px';
+        header.style.fontWeight = 'bold';
+        header.style.textAlign = 'center';
+        header.style.color = '#555';
+        header.style.userSelect = 'none';
+        header.innerText = '✋ Drag to Move Pane';
+        
+        // Drag Logic
+        let isDragging = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        const startDrag = (e) => {
+            isDragging = true;
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            const rect = panel.getBoundingClientRect();
+            dragOffsetX = clientX - rect.left;
+            dragOffsetY = clientY - rect.top;
+        };
+
+        const onDrag = (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            panel.style.left = (clientX - dragOffsetX) + 'px';
+            panel.style.top = (clientY - dragOffsetY) + 'px';
+        };
+
+        const stopDrag = () => { isDragging = false; };
+
+        header.addEventListener('mousedown', startDrag);
+        header.addEventListener('touchstart', startDrag, {passive: false});
+        document.addEventListener('mousemove', onDrag, {passive: false});
+        document.addEventListener('touchmove', onDrag, {passive: false});
+        document.addEventListener('mouseup', stopDrag);
+        document.addEventListener('touchend', stopDrag);
+
+        panel.appendChild(header);
+
+        // UI Body
+        const panelBody = document.createElement('div');
+        panelBody.style.display = 'flex';
+        panelBody.style.flexDirection = 'column';
+        panelBody.style.gap = '15px';
+        panelBody.innerHTML = `
+            <div style="text-align:center;">
+                <h3 style="margin:0; color:#2196F3; font-size:1.2rem;">Adjust Component</h3>
+                <p id="ve-selected-id" style="margin:5px 0 0 0; font-size:0.8rem; color:#888;"></p>
+            </div>
             
             <div style="display:flex; flex-direction:column; gap:4px;">
                 <label style="font-size:0.9rem; font-weight:bold;">Font Size (<span id="ve-val-fs">100</span>%)</label>
@@ -123,7 +178,7 @@
                 <input type="range" id="ve-y" min="-300" max="300" step="5" value="0">
             </div>
 
-            <label style="display:flex; align-items:center; gap:8px; font-weight:bold; color:#F44336;">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:bold; color:#F44336; margin-top:5px;">
                 <input type="checkbox" id="ve-hide" style="width:20px; height:20px;"> Hide Component
             </label>
             
@@ -132,6 +187,8 @@
                 <button id="ve-btn-close" style="padding:8px 16px; background:#2196F3; color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">Done</button>
             </div>
         `;
+        
+        panel.appendChild(panelBody);
         document.body.appendChild(panel);
 
         // Bind Sliders

@@ -73,24 +73,6 @@
         font-family: monospace;
         font-size: 0.9rem;
     }
-    .radio-group {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 10px;
-    }
-    .radio-group label {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 1rem;
-        cursor: pointer;
-        font-weight: bold;
-    }
-    .radio-group input[type="radio"] {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-    }
  </style>
 </head>
 <body>
@@ -116,12 +98,12 @@
      </div>
 
      <div class="admin-section">
-         <h2>2. Profiles & Cloud Sync</h2>
+         <h2>2. Manage Profiles & Cloud Sync</h2>
          
          <!-- LOCAL PROFILES -->
          <div>
              <h3 style="margin: 0 0 10px 0; color: var(--text-color); display: flex; align-items: center; gap: 8px;">
-                 📱 Manage Local Profiles
+                 📱 Local Profiles
              </h3>
              <p style="margin: 0 0 15px 0; font-size: 0.95rem; opacity: 0.9;">Create, delete, or switch the active local profile. All layout edits apply to the Active Local Profile.</p>
              
@@ -139,32 +121,17 @@
          <!-- CLOUD BACKUP -->
          <div>
              <h3 style="margin: 0 0 10px 0; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
-                 📤 Backup Active Profile to Cloud
+                 📤 Backup to Cloud
              </h3>
-             <p style="margin: 0 0 15px 0; font-size: 0.95rem; opacity: 0.9;">Securely save your <strong>Active Local Profile</strong> to Google Drive so it can be downloaded on other devices.</p>
+             <p style="margin: 0 0 15px 0; font-size: 0.95rem; opacity: 0.9;">Backup the <strong>Active Local Profile</strong> to Google Drive. It will be synced under the exact same name.</p>
              
-             <div class="radio-group">
-                 <label><input type="radio" name="cloudSyncType" value="new" checked> New Cloud Profile</label>
-                 <label><input type="radio" name="cloudSyncType" value="update"> Update Existing</label>
-             </div>
-             
-             <div id="cloud-new-group">
-                 <label class="admin-label" style="font-size: 0.9rem;">Cloud Profile Name:</label>
-                 <input type="text" id="cloud-new-name" class="admin-input" placeholder="e.g., Student A iPad Layout">
-             </div>
-             
-             <div id="cloud-update-group" style="display:none;">
-                 <label class="admin-label" style="font-size: 0.9rem;">Select Cloud Profile to Update:</label>
-                 <select id="cloud-update-name" class="admin-input"></select>
-             </div>
-
-             <div style="margin-top: 10px;">
+             <div style="margin-bottom: 10px;">
                  <label class="admin-label" style="font-size: 0.9rem;">Version Description (Optional):</label>
-                 <input type="text" id="cloud-version-desc" class="admin-input" placeholder="e.g., Increased font sizes">
+                 <input type="text" id="cloud-version-desc" class="admin-input" placeholder="e.g., Increased font sizes for iPad">
              </div>
              
-             <button class="action-btn btn-primary" id="btn-cloud-backup" style="margin-top:15px; width: 100%;">
-                 ☁️ Save Active Profile to Google Drive
+             <button class="action-btn btn-primary" id="btn-cloud-backup" style="width: 100%;">
+                 ☁️ Save to Google Drive
              </button>
          </div>
 
@@ -173,15 +140,15 @@
          <!-- CLOUD DOWNLOAD -->
          <div>
              <h3 style="margin: 0 0 10px 0; color: var(--success-color); display: flex; align-items: center; gap: 8px;">
-                 📥 Download Profile from Cloud
+                 📥 Download from Cloud
              </h3>
-             <p style="margin: 0 0 15px 0; font-size: 0.95rem; opacity: 0.9;">Fetch a profile from Google Drive and add it to this device's local profiles.</p>
+             <p style="margin: 0 0 15px 0; font-size: 0.95rem; opacity: 0.9;">Fetch a profile from Google Drive and add it to your local profiles.</p>
              
              <div style="display:flex; flex-direction:column; gap:10px;">
                  <select id="cloud-download-name" class="admin-input"></select>
                  <select id="cloud-download-version" class="admin-input"></select>
                  <button class="action-btn btn-success" id="btn-cloud-download" style="width: 100%;">
-                     Download and Apply Profile
+                     Download and Apply
                  </button>
              </div>
              

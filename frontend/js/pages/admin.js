@@ -16,14 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportMsg = document.getElementById('export-msg');
     
     // Cloud Sync UI Elements
-    const radioSyncTypes = document.getElementsByName('cloudSyncType');
-    const cloudNewGroup = document.getElementById('cloud-new-group');
-    const cloudUpdateGroup = document.getElementById('cloud-update-group');
-    const cloudNewName = document.getElementById('cloud-new-name');
-    const cloudUpdateName = document.getElementById('cloud-update-name');
     const cloudVersionDesc = document.getElementById('cloud-version-desc');
     const btnCloudBackup = document.getElementById('btn-cloud-backup');
-    
     const cloudDownloadName = document.getElementById('cloud-download-name');
     const cloudDownloadVersion = document.getElementById('cloud-download-version');
     const btnCloudDownload = document.getElementById('btn-cloud-download');
@@ -51,15 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('numpal_active_profile', id);
     }
 
-    // Auto-fill cloud name with local profile name
-    function syncCloudNameField() {
-        const activeId = getActiveProfileId();
-        const profiles = getProfiles();
-        if(activeId && profiles[activeId]) {
-            cloudNewName.value = profiles[activeId].name;
-        }
-    }
-
     function refreshProfileDropdown() {
         const profiles = getProfiles();
         
@@ -81,13 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             profileSelect.appendChild(opt);
         }
-        
-        syncCloudNameField();
     }
 
     profileSelect.addEventListener('change', (e) => {
         setActiveProfileId(e.target.value);
-        syncCloudNameField();
         if(typeof window.showToast === 'function') window.showToast('Profile applied successfully!');
     });
 
@@ -222,24 +204,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateCloudDropdowns() {
         const profileNames = Object.keys(globalCloudData);
         
-        cloudUpdateName.innerHTML = '';
         cloudDownloadName.innerHTML = '';
         
         if (profileNames.length === 0) {
-            cloudUpdateName.innerHTML = '<option value="">No profiles in cloud</option>';
             cloudDownloadName.innerHTML = '<option value="">No profiles in cloud</option>';
             cloudDownloadVersion.innerHTML = '<option value="">-</option>';
             return;
         }
 
         profileNames.forEach(name => {
-            const opt1 = document.createElement('option');
-            opt1.value = name; opt1.textContent = name;
-            cloudUpdateName.appendChild(opt1);
-
-            const opt2 = document.createElement('option');
-            opt2.value = name; opt2.textContent = name;
-            cloudDownloadName.appendChild(opt2);
+            const opt = document.createElement('option');
+            opt.value = name; opt.textContent = name;
+            cloudDownloadName.appendChild(opt);
         });
 
         populateVersionsDropdown();
@@ -266,37 +242,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     cloudDownloadName.addEventListener('change', populateVersionsDropdown);
 
-    radioSyncTypes.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            if (e.target.value === 'new') {
-                cloudNewGroup.style.display = 'block';
-                cloudUpdateGroup.style.display = 'none';
-            } else {
-                cloudNewGroup.style.display = 'none';
-                cloudUpdateGroup.style.display = 'block';
-            }
-        });
-    });
-
     btnCloudBackup.addEventListener('click', async () => {
-        const syncType = document.querySelector('input[name="cloudSyncType"]:checked').value;
         const description = cloudVersionDesc.value.trim() || "Manual Backup";
         const profiles = getProfiles();
         const activeId = getActiveProfileId();
-        const activeStyles = profiles[activeId].styles || {};
+        const activeProfile = profiles[activeId];
+        const activeStyles = activeProfile.styles || {};
+        const profileName = activeProfile.name;
         
-        let payload = { description, styles: activeStyles };
+        let payload = { description, styles: activeStyles, profileName };
 
-        if (syncType === 'new') {
-            const newName = cloudNewName.value.trim();
-            if (!newName) return alert("Please enter a new profile name.");
-            payload.action = 'saveProfile';
-            payload.profileName = newName;
-        } else {
-            const updateName = cloudUpdateName.value;
-            if (!updateName) return alert("Please select an existing cloud profile.");
+        // Determine if we should create new or update based on whether it exists in globalCloudData
+        if (globalCloudData[profileName]) {
             payload.action = 'addVersion';
-            payload.profileName = updateName;
+        } else {
+            payload.action = 'saveProfile';
         }
 
         try {
@@ -305,17 +265,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const res = await apiCall(payload);
             
-            if (res.success === false && res.error === "NAME_CONFLICT") {
-                alert("This profile name already exists in the cloud! To avoid overwriting it, please choose a different name, or select 'Update Existing' to add a new version to it.");
+            if (res.success === false) {
+                alert("Cloud Backup Error: " + (res.error || res.message));
                 return;
             }
 
-            if (res.success === false && res.error === "NOT_FOUND") {
-                alert("The selected profile no longer exists in the cloud. Please refresh.");
-                return;
-            }
-
-            if(typeof window.showToast === 'function') window.showToast("Successfully backed up to Google Drive!");
+            if(typeof window.showToast === 'function') window.showToast(`Successfully backed up "${profileName}" to Google Drive!`);
             cloudVersionDesc.value = '';
             
             // Reload data to reflect changes
@@ -325,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Backup failed: " + err.message);
         } finally {
             btnCloudBackup.disabled = false;
-            btnCloudBackup.innerText = "☁️ Save Active Profile to Google Drive";
+            btnCloudBackup.innerText = "☁️ Save to Google Drive";
         }
     });
 

@@ -3,14 +3,37 @@
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Basic Management UI Elements
     const profileSelect = document.getElementById('profile-select');
     const btnCreate = document.getElementById('btn-create-profile');
     const btnDelete = document.getElementById('btn-delete-profile');
     const btnEnterEditor = document.getElementById('btn-enter-editor');
+    
+    // Manual Backup UI Elements
     const configData = document.getElementById('config-data');
     const btnExport = document.getElementById('btn-export');
     const btnImport = document.getElementById('btn-import');
     const exportMsg = document.getElementById('export-msg');
+    
+    // Cloud Sync UI Elements
+    const radioSyncTypes = document.getElementsByName('cloudSyncType');
+    const cloudNewGroup = document.getElementById('cloud-new-group');
+    const cloudUpdateGroup = document.getElementById('cloud-update-group');
+    const cloudNewName = document.getElementById('cloud-new-name');
+    const cloudUpdateName = document.getElementById('cloud-update-name');
+    const cloudVersionDesc = document.getElementById('cloud-version-desc');
+    const btnCloudBackup = document.getElementById('btn-cloud-backup');
+    
+    const cloudDownloadName = document.getElementById('cloud-download-name');
+    const cloudDownloadVersion = document.getElementById('cloud-download-version');
+    const btnCloudDownload = document.getElementById('btn-cloud-download');
+    const btnRefreshCloud = document.getElementById('btn-refresh-cloud');
+
+    let globalCloudData = {};
+
+    // ==========================================
+    // Local Profile Management Logic
+    // ==========================================
 
     function getProfiles() {
         return JSON.parse(localStorage.getItem('numpal_profiles') || '{}');
@@ -30,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function refreshProfileDropdown() {
         const profiles = getProfiles();
-        const activeId = getActiveProfileId();
         
         // Ensure at least a default profile exists
         if (Object.keys(profiles).length === 0) {
@@ -97,16 +119,16 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Please select or create a profile first.");
             return;
         }
-        // Set mode flag and redirect to main app index
         localStorage.setItem('numpal_admin_edit_mode', 'true');
         window.location.href = '../../index.html';
     });
 
+    // ==========================================
+    // Manual Backup Logic
+    // ==========================================
+
     btnExport.addEventListener('click', () => {
-        const payload = {
-            version: "1.0",
-            profiles: getProfiles()
-        };
+        const payload = { version: "1.0", profiles: getProfiles() };
         const jsonStr = JSON.stringify(payload, null, 2);
         configData.value = jsonStr;
         
@@ -123,15 +145,11 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const inputData = configData.value.trim();
             if (!inputData) throw new Error("No data to import.");
-            
             const payload = JSON.parse(inputData);
             if (!payload.profiles) throw new Error("Invalid format. Missing 'profiles' object.");
 
             const currentProfiles = getProfiles();
-            // Merge profiles
             for (const [id, profile] of Object.entries(payload.profiles)) {
-                // To avoid overriding locally created profiles with same timestamp ID by coincidence,
-                // we create fresh IDs for imported profiles, unless they explicitly want to overwrite (we'll just create new)
                 const newId = 'imported_' + id + '_' + Date.now();
                 currentProfiles[newId] = {
                     name: profile.name + " (Imported)",
@@ -149,6 +167,187 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Initialize
+    // ==========================================
+    // Cloud Sync Logic
+    // ==========================================
+
+    async function apiCall(payload) {
+        if (!navigator.onLine) {
+            throw new Error("You are offline. Please connect to the internet.");
+        }
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (result.error && result.error === true) {
+            throw new Error(result.message || "Unknown API Error");
+        }
+        return result;
+    }
+
+    async function fetchCloudData() {
+        try {
+            if(typeof window.showToast === 'function') window.showToast("Loading Cloud Profiles...");
+            btnRefreshCloud.disabled = true;
+            btnRefreshCloud.innerText = "⏳ Loading...";
+
+            const res = await apiCall({ action: 'getProfiles' });
+            globalCloudData = res.db || {};
+            
+            populateCloudDropdowns();
+            
+            if(typeof window.showToast === 'function') window.showToast("Cloud Data Sync Complete!");
+        } catch (err) {
+            alert("Failed to load cloud profiles: " + err.message);
+        } finally {
+            btnRefreshCloud.disabled = false;
+            btnRefreshCloud.innerText = "🔄 Refresh Cloud Profiles";
+        }
+    }
+
+    function populateCloudDropdowns() {
+        const profileNames = Object.keys(globalCloudData);
+        
+        cloudUpdateName.innerHTML = '';
+        cloudDownloadName.innerHTML = '';
+        
+        if (profileNames.length === 0) {
+            cloudUpdateName.innerHTML = '<option value="">No profiles in cloud</option>';
+            cloudDownloadName.innerHTML = '<option value="">No profiles in cloud</option>';
+            cloudDownloadVersion.innerHTML = '';
+            return;
+        }
+
+        profileNames.forEach(name => {
+            const opt1 = document.createElement('option');
+            opt1.value = name; opt1.textContent = name;
+            cloudUpdateName.appendChild(opt1);
+
+            const opt2 = document.createElement('option');
+            opt2.value = name; opt2.textContent = name;
+            cloudDownloadName.appendChild(opt2);
+        });
+
+        populateVersionsDropdown();
+    }
+
+    function populateVersionsDropdown() {
+        const selectedProfile = cloudDownloadName.value;
+        cloudDownloadVersion.innerHTML = '';
+
+        if (!selectedProfile || !globalCloudData[selectedProfile]) return;
+
+        const history = globalCloudData[selectedProfile];
+        // Sort history by version descending (newest first)
+        const sortedHistory = [...history].sort((a,b) => b.version - a.version);
+
+        sortedHistory.forEach(v => {
+            const dateStr = new Date(v.timestamp).toLocaleDateString();
+            const opt = document.createElement('option');
+            opt.value = v.version;
+            opt.textContent = `v${v.version} - ${v.description} (${dateStr})`;
+            cloudDownloadVersion.appendChild(opt);
+        });
+    }
+
+    cloudDownloadName.addEventListener('change', populateVersionsDropdown);
+
+    radioSyncTypes.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'new') {
+                cloudNewGroup.style.display = 'block';
+                cloudUpdateGroup.style.display = 'none';
+            } else {
+                cloudNewGroup.style.display = 'none';
+                cloudUpdateGroup.style.display = 'block';
+            }
+        });
+    });
+
+    btnCloudBackup.addEventListener('click', async () => {
+        const syncType = document.querySelector('input[name="cloudSyncType"]:checked').value;
+        const description = cloudVersionDesc.value.trim() || "Manual Backup";
+        const profiles = getProfiles();
+        const activeId = getActiveProfileId();
+        const activeStyles = profiles[activeId].styles || {};
+        
+        let payload = { description, styles: activeStyles };
+
+        if (syncType === 'new') {
+            const newName = cloudNewName.value.trim();
+            if (!newName) return alert("Please enter a new profile name.");
+            payload.action = 'saveProfile';
+            payload.profileName = newName;
+        } else {
+            const updateName = cloudUpdateName.value;
+            if (!updateName) return alert("Please select an existing cloud profile.");
+            payload.action = 'addVersion';
+            payload.profileName = updateName;
+        }
+
+        try {
+            btnCloudBackup.disabled = true;
+            btnCloudBackup.innerText = "⏳ Saving to Cloud...";
+            
+            const res = await apiCall(payload);
+            
+            if (res.success === false && res.error === "NAME_CONFLICT") {
+                alert("This profile name already exists in the cloud! To avoid overwriting it, please choose a different name, or select 'Update Existing' to add a new version to it.");
+                return;
+            }
+
+            if (res.success === false && res.error === "NOT_FOUND") {
+                alert("The selected profile no longer exists in the cloud. Please refresh.");
+                return;
+            }
+
+            if(typeof window.showToast === 'function') window.showToast("Successfully backed up to Google Drive!");
+            cloudNewName.value = '';
+            cloudVersionDesc.value = '';
+            
+            // Reload data to reflect changes
+            await fetchCloudData();
+
+        } catch (err) {
+            alert("Backup failed: " + err.message);
+        } finally {
+            btnCloudBackup.disabled = false;
+            btnCloudBackup.innerText = "☁️ Save to Google Drive";
+        }
+    });
+
+    btnCloudDownload.addEventListener('click', () => {
+        const profileName = cloudDownloadName.value;
+        const versionStr = cloudDownloadVersion.value;
+
+        if (!profileName || !versionStr) return alert("Please select a valid profile and version to download.");
+
+        const history = globalCloudData[profileName];
+        const selectedVersionData = history.find(v => v.version.toString() === versionStr.toString());
+
+        if (!selectedVersionData) return alert("Version data not found.");
+
+        const profiles = getProfiles();
+        const newId = 'cloud_' + Date.now();
+        profiles[newId] = {
+            name: `${profileName} (v${versionStr})`,
+            styles: selectedVersionData.styles || {}
+        };
+        
+        saveProfiles(profiles);
+        setActiveProfileId(newId);
+        refreshProfileDropdown();
+        
+        if(typeof window.showToast === 'function') window.showToast("Cloud Profile downloaded and applied successfully!");
+    });
+
+    btnRefreshCloud.addEventListener('click', fetchCloudData);
+
+    // Initialize Local Dropdown
     refreshProfileDropdown();
+    
+    // Auto-fetch cloud profiles on load
+    fetchCloudData();
 });

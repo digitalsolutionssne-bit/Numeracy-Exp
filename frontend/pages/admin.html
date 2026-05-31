@@ -59,6 +59,10 @@
         align-items: center;
         gap: 8px;
     }
+    .action-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
     .btn-primary { background: var(--primary-color); color: white; }
     .btn-success { background: var(--success-color); color: white; }
     .btn-danger { background: var(--error-color); color: white; }
@@ -68,6 +72,28 @@
         resize: vertical;
         font-family: monospace;
         font-size: 0.9rem;
+    }
+    .radio-group {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+    .radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 1.1rem;
+        cursor: pointer;
+    }
+    .radio-group input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    .cloud-box {
+        padding: 15px;
+        border-radius: 8px;
+        border: 2px solid;
     }
  </style>
 </head>
@@ -107,15 +133,70 @@
      </div>
 
      <div class="admin-section">
-         <h2>3. Backup & Share Configurations</h2>
-         <p style="margin: 0; font-size: 1rem; opacity: 0.9;">Export your layout profiles to share with another device, or import a shared configuration code here.</p>
+         <h2>3. Cloud Backup & Sync (Google Drive)</h2>
+         <p style="margin: 0; font-size: 1rem; opacity: 0.9;">Securely save and retrieve layout profiles across different devices using the app's Google Drive backend.</p>
+         
+         <!-- Backup Active Profile -->
+         <div class="cloud-box" style="background-color: rgba(74, 144, 226, 0.1); border-color: rgba(74, 144, 226, 0.3);">
+             <h3 style="margin: 0 0 15px 0; color: var(--primary-color);">📤 Backup Active Profile</h3>
+             
+             <div class="radio-group">
+                 <label><input type="radio" name="cloudSyncType" value="new" checked> Create New</label>
+                 <label><input type="radio" name="cloudSyncType" value="update"> Update Existing</label>
+             </div>
+             
+             <div id="cloud-new-group">
+                 <label class="admin-label">New Cloud Profile Name:</label>
+                 <input type="text" id="cloud-new-name" class="admin-input" placeholder="e.g., Student A iPad Layout">
+             </div>
+             
+             <div id="cloud-update-group" style="display:none;">
+                 <label class="admin-label">Select Existing Cloud Profile:</label>
+                 <select id="cloud-update-name" class="admin-input"></select>
+             </div>
+
+             <div style="margin-top: 10px;">
+                 <label class="admin-label">Version Description (Optional):</label>
+                 <input type="text" id="cloud-version-desc" class="admin-input" placeholder="e.g., Increased font sizes">
+             </div>
+             
+             <button class="action-btn btn-primary" id="btn-cloud-backup" style="margin-top:15px; width: 100%;">
+                 ☁️ Save to Google Drive
+             </button>
+         </div>
+         
+         <!-- Download Profile -->
+         <div class="cloud-box" style="background-color: rgba(76, 175, 80, 0.1); border-color: rgba(76, 175, 80, 0.3);">
+             <h3 style="margin: 0 0 15px 0; color: var(--success-color);">📥 Download & Apply</h3>
+             <div style="display:flex; flex-direction:column; gap:10px;">
+                 <div>
+                     <label class="admin-label">Select Cloud Profile:</label>
+                     <select id="cloud-download-name" class="admin-input"></select>
+                 </div>
+                 <div>
+                     <label class="admin-label">Select Specific Version:</label>
+                     <select id="cloud-download-version" class="admin-input"></select>
+                 </div>
+                 <button class="action-btn btn-success" id="btn-cloud-download" style="margin-top:5px; width: 100%;">
+                     Download and Apply Profile
+                 </button>
+             </div>
+         </div>
+         <div style="text-align:center;">
+             <button class="action-btn" id="btn-refresh-cloud" style="background: var(--card-bg); color: var(--text-color); border: 2px solid var(--card-border); margin: 0 auto; display: inline-flex;">🔄 Refresh Cloud Profiles</button>
+         </div>
+     </div>
+
+     <div class="admin-section">
+         <h2>4. Manual Backup via Code</h2>
+         <p style="margin: 0; font-size: 1rem; opacity: 0.9;">Export your layout profiles directly to your clipboard, or paste a code to import.</p>
          
          <label class="admin-label">Configuration Data (JSON):</label>
          <textarea id="config-data" class="admin-input" placeholder="Paste configuration data here to import..."></textarea>
          
          <div class="btn-group">
-             <button class="action-btn btn-primary" id="btn-export">📤 Export All</button>
-             <button class="action-btn btn-success" id="btn-import">📥 Import & Merge</button>
+             <button class="action-btn btn-primary" id="btn-export">📋 Copy Code</button>
+             <button class="action-btn btn-success" id="btn-import">📥 Import Code</button>
          </div>
          <p id="export-msg" style="color: var(--success-color); font-weight: bold; margin: 0; display: none; text-align: center;">Copied to clipboard!</p>
      </div>
